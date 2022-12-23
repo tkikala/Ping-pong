@@ -22,7 +22,7 @@ public class Ball extends Rectangle {
     }
 
     public void setXDirection (int randomXDirection){
-        xVelocity =randomXDirection;
+        xVelocity = randomXDirection;
     }
 
     public void setYDirection (int randomYDirection){

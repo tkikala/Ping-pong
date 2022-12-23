@@ -21,11 +21,13 @@ public class GamePanel extends JPanel implements Runnable {
     Paddle paddle_2;
     Ball ball;
     Score score;
+    CollisionChecker collisionChecker;
 
     GamePanel() {
         newPeddle();
         newBall();
         score = new Score(FRAME_WIDTH, FRAME_HEIGHT);
+        collisionChecker = new CollisionChecker();
         this.setFocusable(true);
         this.addKeyListener(new AL());
         this.setPreferredSize(SCREEN);
@@ -69,16 +71,12 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void checkCollision() {
         //Reflection of Ball when it touches top and bottom edges!
-        if(ball.y <= 0) {
+        if(collisionChecker.didTouchTopOrBottomEdge(ball.y, FRAME_HEIGHT-BALL_DIAMETER)) {
             ball.setYDirection(-ball.yVelocity);
         }
-        if(ball.y >= (FRAME_HEIGHT-BALL_DIAMETER)) {
-            ball.setYDirection(-ball.yVelocity);
-        }
-
 
         //Reflection of ball when it touches paddles!
-        if(ball.intersects(new Rectangle(paddle_1.x, paddle_1.y1, paddle_1.width, paddle_1.height))) {
+        if(collisionChecker.didTouchPaddle(ball, new Rectangle(paddle_1.x, paddle_1.y1, paddle_1.width, paddle_1.height))) {
             ball.xVelocity = Math.abs(ball.xVelocity);
             ball.xVelocity++;       // increasing ball's speed!
             if (ball.yVelocity > 0)
@@ -88,7 +86,7 @@ public class GamePanel extends JPanel implements Runnable {
             ball.setXDirection(ball.xVelocity);
             ball.setYDirection(ball.yVelocity);
         }
-        if(ball.intersects(new Rectangle(paddle_2.x, paddle_2.y2, paddle_2.width, paddle_2.height))) {
+        if(collisionChecker.didTouchPaddle(ball, new Rectangle(paddle_2.x, paddle_2.y2, paddle_2.width, paddle_2.height))) {
             ball.xVelocity = Math.abs(ball.xVelocity);
             ball.xVelocity++;       // increasing ball's speed!
             if (ball.yVelocity > 0)
@@ -111,12 +109,14 @@ public class GamePanel extends JPanel implements Runnable {
 
 
         //Gives player  1 point and / resets the game!
-        if(ball.x <= 0) {
+        if(collisionChecker.didTouchLeftEdge(ball.x)) {
             score.player_2++;
             newPeddle();
             newBall();
 
-        } if(ball.x >= FRAME_WIDTH -BALL_DIAMETER) {
+        }
+
+        if(collisionChecker.didTouchRightEdge(ball.x, FRAME_WIDTH-BALL_DIAMETER)) {
             score.player_1++;
             newPeddle();
             newBall();
